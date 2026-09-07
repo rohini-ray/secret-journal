@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Noctuary is a private ten-page secret journal by Rohini Ray. Customise the cover, write in silence, share only if you choose."
+    />
+    <title>Noctuary — A Secret Journal by Rohini Ray</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500&family=Source+Sans+3:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="night" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">✦</span>
+        <div>
+          <p class="brand-name">Noctuary</p>
+          <p class="brand-sub">A secret journal</p>
+        </div>
+      </div>
+      <nav class="top-actions">
+        <button type="button" class="ghost" data-open="idea">The idea</button>
+        <button type="button" class="ghost" id="share-btn">Share journal</button>
+      </nav>
+    </header>
+
+    <main>
+      <section class="stage" id="studio">
+        <div class="book-wrap">
+          <div class="book" id="book">
+            <div class="cover" id="cover" data-cloth="midnight">
+              <div class="cover-shine" aria-hidden="true"></div>
+              <div class="cover-ornaments" id="ornament-layer"></div>
+              <div class="cover-title-block">
+                <p class="cover-kicker">Private folio</p>
+                <h1 id="cover-title-display">My Secret Journal</h1>
+                <p class="cover-by">kept by you · ten pages</p>
+              </div>
+            </div>
+            <div class="pages-spread" id="pages-spread" hidden>
+              <article class="leaf leaf-left">
+                <p class="leaf-index" id="left-index">i</p>
+                <textarea
+                  id="left-page"
+                  maxlength="1800"
+                  placeholder="Write what no one else should overhear…"
+                  spellcheck="true"
+                ></textarea>
+                <p class="leaf-count"><span id="left-count">0</span> / 1800</p>
+              </article>
+              <article class="leaf leaf-right">
+                <p class="leaf-index" id="right-index">ii</p>
+                <textarea
+                  id="right-page"
+                  maxlength="1800"
+                  placeholder="Continue on the facing page…"
+                  spellcheck="true"
+                ></textarea>
+                <p class="leaf-count"><span id="right-count">0</span> / 1800</p>
+              </article>
+            </div>
+          </div>
+          <div class="pager" id="pager" hidden>
+            <button type="button" id="prev-spread">Previous</button>
+            <p id="spread-label">Pages 1 – 2 of 10</p>
+            <button type="button" id="next-spread">Next</button>
+          </div>
+        </div>
+
+        <aside class="atelier" id="atelier">
+          <h2>Cover atelier</h2>
+          <p class="hint">
+            Click the cloth to place a charm. Drag to move. Select and press
+            delete to remove.
+          </p>
+
+          <label class="field">
+            Title on the cover
+            <input
+              id="journal-title"
+              type="text"
+              maxlength="48"
+              value="My Secret Journal"
+            />
+          </label>
+
+          <div class="field">
+            Cloth colour
+            <div class="swatches" id="cloth-swatches"></div>
+          </div>
+
+          <div class="field">
+            Stars
+            <div class="chip-row" id="star-tools"></div>
+          </div>
+
+          <div class="field">
+            Flowers
+            <div class="chip-row" id="flower-tools"></div>
+          </div>
+
+          <div class="field">
+            Flower colour
+            <div class="swatches" id="flower-swatches"></div>
+          </div>
+
+          <div class="field">
+            Charms
+            <div class="chip-row emoji-row" id="emoji-tools"></div>
+          </div>
+
+          <div class="atelier-actions">
+            <button type="button" class="ghost" id="clear-ornaments">
+              Clear cover
+            </button>
+            <button type="button" class="solid" id="open-journal">
+              Open journal
+            </button>
+          </div>
+          <p class="privacy-note">
+            Secrets stay in this browser. No account. No server copy.
+          </p>
+        </aside>
+      </section>
+
+      <section class="reader-banner" id="reader-banner" hidden>
+        <p>
+          You are reading a shared journal. You cannot edit these pages.
+        </p>
+        <a href="./">Start your own Noctuary</a>
+      </section>
+    </main>
+
+    <footer class="site-foot">
+      <p>© 2026 Rohini Ray. All rights reserved.</p>
+      <p>Noctuary — a secret journal. Ten pages. Yours alone unless you share.</p>
+    </footer>
+
+    <dialog class="modal" id="idea-modal">
+      <article>
+        <h2>The idea</h2>
+        <p>
+          Noctuary is a quiet book for thoughts that do not belong on a feed.
+          You dress the cover with stars of different geometries, coloured
+          flowers, and small charms. Inside there are ten pages — enough for a
+          secret, not enough to become a dump.
+        </p>
+        <p>
+          The journal never leaves your device unless you create a share link.
+          That link holds an encrypted snapshot in the address itself, so there
+          is no public archive of other people’s writing.
+        </p>
+        <p class="copyright-block">
+          © 2026 Rohini Ray. The name Noctuary, this site, and its idea are
+          the copyright of Rohini Ray.
+        </p>
+        <button type="button" class="solid" data-close="idea">Close</button>
+      </article>
+    </dialog>
+
+    <dialog class="modal" id="share-modal">
+      <article>
+        <h2>Share this journal</h2>
+        <p>
+          Anyone with this link can read a snapshot of your ten pages and
+          cover. They cannot see later edits unless you share again.
+        </p>
+        <textarea id="share-link" readonly rows="4"></textarea>
+        <div class="atelier-actions">
+          <button type="button" class="solid" id="copy-link">Copy link</button>
+          <button type="button" class="ghost" data-close="share">Done</button>
+        </div>
+        <p class="hint" id="copy-status" hidden>Copied to clipboard.</p>
+      </article>
+    </dialog>
+
+    <script src="app.js"></script>
+  </body>
+</html>
