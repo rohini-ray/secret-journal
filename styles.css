@@ -392,6 +392,29 @@ button:hover,
   transform: rotate(135deg);
 }
 
+/* Colour choices echo the decoration that will be placed on the cover. */
+#star-swatches .swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: 0;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 94%, 50% 72%, 21% 94%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+#flower-swatches .swatch {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  margin: 3px;
+  border: 0;
+  border-radius: 0;
+  clip-path: none;
+  filter: drop-shadow(0 0 0.75px rgba(255, 255, 255, 0.8));
+  -webkit-mask: radial-gradient(circle at 50% 23%, #000 0 21%, transparent 22%), radial-gradient(circle at 76% 42%, #000 0 21%, transparent 22%), radial-gradient(circle at 66% 72%, #000 0 21%, transparent 22%), radial-gradient(circle at 34% 72%, #000 0 21%, transparent 22%), radial-gradient(circle at 24% 42%, #000 0 21%, transparent 22%), radial-gradient(circle at 50% 51%, #000 0 22%, transparent 23%);
+  -webkit-mask-composite: source-over;
+  mask: radial-gradient(circle at 50% 23%, #000 0 21%, transparent 22%), radial-gradient(circle at 76% 42%, #000 0 21%, transparent 22%), radial-gradient(circle at 66% 72%, #000 0 21%, transparent 22%), radial-gradient(circle at 34% 72%, #000 0 21%, transparent 22%), radial-gradient(circle at 24% 42%, #000 0 21%, transparent 22%), radial-gradient(circle at 50% 51%, #000 0 22%, transparent 23%);
+  mask-composite: add;
+}
+
 .swatch.active {
   outline: 2px solid var(--gold);
   outline-offset: 2px;
