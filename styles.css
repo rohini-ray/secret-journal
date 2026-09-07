@@ -383,6 +383,15 @@ button:hover,
   cursor: pointer;
 }
 
+/* The cloth palette is a set of fabric drops; the other palettes stay round. */
+#cloth-swatches .swatch {
+  width: 25px;
+  height: 34px;
+  border-radius: 50% 50% 50% 0;
+  margin: 5px 8px 5px 5px;
+  transform: rotate(135deg);
+}
+
 .swatch.active {
   outline: 2px solid var(--gold);
   outline-offset: 2px;

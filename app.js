@@ -26,10 +26,12 @@ const FLOWERS = [
 ];
 
 const FLOWER_COLORS = ["#e8a0b4", "#f3d67b", "#f4f0e6", "#c45c6a", "#8ec5a2", "#c9a6e0"];
+const STAR_COLORS = ["#f7e7b4", "#f3d67b", "#f2a7bc", "#b7d8ff", "#cdb4f5", "#9fd5b2"];
 const EMOJIS = ["🌙", "⭐", "✨", "💫", "🦋", "💌", "🗝️", "🕯️", "🌸", "🌺", "🌻", "🌷"];
 
 const state = loadState();
 let tool = { kind: "star", id: "five" };
+let starColor = STAR_COLORS[0];
 let flowerColor = FLOWER_COLORS[0];
 let selectedId = null;
 let spread = 0;
@@ -43,6 +45,7 @@ const el = {
   titleInput: document.getElementById("journal-title"),
   clothSwatches: document.getElementById("cloth-swatches"),
   starTools: document.getElementById("star-tools"),
+  starSwatches: document.getElementById("star-swatches"),
   flowerTools: document.getElementById("flower-tools"),
   flowerSwatches: document.getElementById("flower-swatches"),
   emojiTools: document.getElementById("emoji-tools"),
@@ -58,7 +61,9 @@ const el = {
   spreadLabel: document.getElementById("spread-label"),
   shareLink: document.getElementById("share-link"),
   copyStatus: document.getElementById("copy-status"),
+  shareError: document.getElementById("share-error"),
   readerBanner: document.getElementById("reader-banner"),
+  deleteSelected: document.getElementById("delete-selected"),
 };
 
 function emptyPages() {
@@ -79,11 +84,21 @@ function loadState() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return defaultState();
     const parsed = JSON.parse(raw);
-    return {
+    const restored = {
       ...defaultState(),
       ...parsed,
       pages: Array.from({ length: MAX_PAGES }, (_, i) => parsed.pages?.[i] || ""),
     };
+    // Old drafts used `id` for both the unique record ID and the decoration.
+    // Upgrade them so an internal UUID is never displayed on the cover.
+    restored.ornaments = Array.isArray(parsed.ornaments)
+      ? parsed.ornaments.map((item) => ({
+          ...item,
+          id: item.id || uid(),
+          variant: item.variant || (item.kind === "emoji" ? "✨" : item.kind === "flower" ? "rose" : "five"),
+        }))
+      : [];
+    return restored;
   } catch {
     return defaultState();
   }
@@ -146,12 +161,12 @@ function flowerSvg(kind, color, size) {
 function ornamentMarkup(item) {
   const size = 48;
   if (item.kind === "emoji") {
-    return `<span class="glyph">${item.id}</span>`;
+    return `<span class="glyph">${item.variant}</span>`;
   }
   if (item.kind === "star") {
-    return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" fill="#f7e7b4">${starPath(item.id, size)}</svg>`;
+    return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" fill="${item.color || STAR_COLORS[0]}">${starPath(item.variant, size)}</svg>`;
   }
-  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${flowerSvg(item.id, item.color, size)}</svg>`;
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">${flowerSvg(item.variant, item.color, size)}</svg>`;
 }
 
 function renderCover() {
@@ -168,6 +183,15 @@ function renderCover() {
     node.innerHTML = ornamentMarkup(item);
     el.layer.appendChild(node);
   });
+  el.deleteSelected.disabled = readOnly || !selectedId;
+}
+
+function deleteSelectedOrnament() {
+  if (readOnly || !selectedId) return;
+  state.ornaments = state.ornaments.filter((item) => item.id !== selectedId);
+  selectedId = null;
+  save();
+  renderCover();
 }
 
 function renderTools() {
@@ -179,6 +203,11 @@ function renderTools() {
   el.starTools.innerHTML = STARS.map(
     (s) =>
       `<button type="button" class="chip${tool.kind === "star" && tool.id === s.id ? " active" : ""}" data-tool="star:${s.id}">${s.label}</button>`
+  ).join("");
+
+  el.starSwatches.innerHTML = STAR_COLORS.map(
+    (color) =>
+      `<button type="button" class="swatch${starColor === color ? " active" : ""}" data-star-color="${color}" style="background:${color}" aria-label="Select star colour"></button>`
   ).join("");
 
   el.flowerTools.innerHTML = FLOWERS.map(
@@ -250,11 +279,13 @@ el.cover.addEventListener("pointerdown", (event) => {
   const item = {
     id: uid(),
     kind: tool.kind,
+    variant: tool.id,
     x: pos.x,
     y: pos.y,
     rotate: tool.kind === "star" ? Math.random() * 40 - 20 : 0,
     scale: 0.85 + Math.random() * 0.4,
   };
+  if (tool.kind === "star") item.color = starColor;
   if (tool.kind === "flower") item.color = flowerColor;
   state.ornaments.push(item);
   selectedId = item.id;
@@ -284,10 +315,7 @@ document.addEventListener("keydown", (event) => {
   if ((event.key === "Delete" || event.key === "Backspace") && selectedId) {
     const tag = event.target.tagName;
     if (tag === "INPUT" || tag === "TEXTAREA") return;
-    state.ornaments = state.ornaments.filter((o) => o.id !== selectedId);
-    selectedId = null;
-    save();
-    renderCover();
+    deleteSelectedOrnament();
   }
 });
 
@@ -318,6 +346,14 @@ el.starTools.addEventListener("click", onToolClick);
 el.flowerTools.addEventListener("click", onToolClick);
 el.emojiTools.addEventListener("click", onToolClick);
 
+el.starSwatches.addEventListener("click", (event) => {
+  const btn = event.target.closest("[data-star-color]");
+  if (!btn || readOnly) return;
+  starColor = btn.dataset.starColor;
+  tool = { kind: "star", id: tool.kind === "star" ? tool.id : "five" };
+  renderTools();
+});
+
 el.flowerSwatches.addEventListener("click", (event) => {
   const btn = event.target.closest("[data-flower-color]");
   if (!btn) return;
@@ -333,6 +369,8 @@ document.getElementById("clear-ornaments").addEventListener("click", () => {
   save();
   renderCover();
 });
+
+el.deleteSelected.addEventListener("click", deleteSelectedOrnament);
 
 document.getElementById("open-journal").addEventListener("click", () => {
   const shouldOpen = el.pagesSpread.hidden;
@@ -413,15 +451,38 @@ document.getElementById("share-btn").addEventListener("click", async () => {
     document.getElementById("share-modal").showModal();
     return;
   }
-  const token = await encryptJournal();
-  const url = `${location.origin}${location.pathname}#share=${token}`;
-  el.shareLink.value = url;
   el.copyStatus.hidden = true;
+  el.shareError.hidden = true;
+  try {
+    if (!window.isSecureContext || !crypto?.subtle) {
+      throw new Error("Secure encryption is unavailable in this browser context.");
+    }
+    const token = await encryptJournal();
+    // This keeps the encrypted journal out of server requests; only the person
+    // who receives the complete URL can decrypt the snapshot.
+    el.shareLink.value = `${location.href.split("#")[0]}#share=${token}`;
+  } catch {
+    el.shareLink.value = "";
+    el.shareError.textContent = "Could not create a secure share link here. Open the journal from a deployed HTTPS website and try again.";
+    el.shareError.hidden = false;
+  }
   document.getElementById("share-modal").showModal();
 });
 
 document.getElementById("copy-link").addEventListener("click", async () => {
-  await navigator.clipboard.writeText(el.shareLink.value);
+  if (!el.shareLink.value) return;
+  let copied = false;
+  try {
+    await navigator.clipboard.writeText(el.shareLink.value);
+    copied = true;
+  } catch {
+    el.shareLink.focus();
+    el.shareLink.select();
+    copied = document.execCommand("copy");
+  }
+  el.copyStatus.textContent = copied
+    ? "Copied to clipboard."
+    : "Select the link above, then press Ctrl + C to copy it.";
   el.copyStatus.hidden = false;
 });
 
