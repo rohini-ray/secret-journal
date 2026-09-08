@@ -425,6 +425,25 @@ button:hover,
   font-size: 13px;
 }
 
+.bookmark-reminder {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin: 14px 0 0;
+  padding: 11px 12px;
+  border: 1px solid rgba(220, 180, 87, 0.52);
+  border-radius: 10px;
+  background: rgba(220, 180, 87, 0.1);
+  color: var(--paper);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.bookmark-reminder strong {
+  display: block;
+  color: var(--gold);
+}
+
 .site-foot {
   flex-direction: column;
   align-items: flex-start;
